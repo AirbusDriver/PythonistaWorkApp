@@ -55,6 +55,32 @@ def get_max_tailwind_velocity(max_component, wind_dir, runway=360):
             return -1
 
 
+def max_wind_grid(reference_hdg, num, max_tail=0, max_cross=0, increment=10):
+    try:
+        assert any([
+            max_tail, max_cross
+        ])
+    except AssertionError as e:
+        raise ValueError('must provide either max_tail or max_cross')
+    left_bucket = (reference_hdg - (num * increment)) % 360
+    right__bucket = ((reference_hdg) + (num * increment)) % 360
+    buckets = []
+    idx = left_bucket - increment
+    idx %= 360
+    while idx != right__bucket:
+        idx += increment
+        idx %= 360
+        buckets.append(idx)
+
+    out = {}
+
+    for theta in buckets:
+        max_xwind = get_max_crosswind_velocity(max_cross, theta, reference_hdg)
+        out[theta] = max_xwind
+
+    return out
+
+
 class WindCalculator():
     def __init__(self):
         self._runway_heading = 000
@@ -178,7 +204,7 @@ class WindShell(cmd.Cmd):
 
     @staticmethod
     def _parse_line(line):
-        return tuple(arg.split())
+        return tuple(line.split())
 
     @staticmethod
     def _cast_float(line):

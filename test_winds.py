@@ -1,7 +1,7 @@
 import pytest
 
 from winds import (get_headwind, get_crosswind, get_winds, Wind, get_max_crosswind_velocity,
-                   get_max_tailwind_velocity)
+                   get_max_tailwind_velocity, max_wind_grid)
 
 
 @pytest.mark.parametrize('_input, expected', [
@@ -62,3 +62,38 @@ def test_get_max_tailwind_returns_neg_one_for_lessthan_ninety(max_tailwind, wind
 def test_get_max_tailwind_returns_correct_velocity(max_tailwind, wind_dir, runway, expected):
     result = get_max_tailwind_velocity(max_tailwind, wind_dir, runway)
     assert result == pytest.approx(expected, abs=.05)
+
+
+@pytest.mark.parametrize('ref_hdg, num, max_tail, max_cross, expected_hdgs', [
+    (360, 2, 10, 10, [340, 350, 0, 10, 20]),
+    (90, 3, 10, 10, [60, 70, 80, 90, 100, 110, 120])
+])
+def test_max_wind_grid_makes_proper_wind_buckets(ref_hdg, num, max_tail, max_cross, expected_hdgs):
+    result = max_wind_grid(ref_hdg, num, max_tail=max_tail, max_cross=max_cross)
+    assert sorted(expected_hdgs) == sorted(list(result.keys()))
+    assert result
+
+
+@pytest.mark.parametrize('ref_hdg, num, max_cross, expected', [
+    (90, 2, 10, {
+        70: 29.24,
+        80: 57.59,
+        90: -1,
+        100: 57.59,
+        110: 29.24
+    }),
+    (360, 2, 10, {
+        340: 29.24,
+        350: 57.59,
+        0: -1,
+        10: 57.59,
+        20: 29.24
+    })
+])
+def test_max_wind_grid_makes_proper_wind_returns_when_xwind_exceeded(ref_hdg, num, max_cross, expected):
+    max_tail = 1000
+    result_dict = max_wind_grid(ref_hdg, num, max_tail=max_tail, max_cross=max_cross, increment=10)
+    assert all([
+        expected[k] == pytest.approx(result_dict[k], rel=.01) for k in expected
+    ])
+    assert expected.keys() == result_dict.keys()
