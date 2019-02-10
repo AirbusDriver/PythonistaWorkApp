@@ -76,11 +76,11 @@ def test_max_wind_grid_makes_proper_wind_buckets(ref_hdg, num, max_tail, max_cro
 
 @pytest.mark.parametrize('ref_hdg, num, max_cross, expected', [
     (90, 2, 10, {
-        70: 29.24,
-        80: 57.59,
-        90: -1,
-        100: 57.59,
-        110: 29.24
+        70: 10.64,
+        80: 10.15,
+        90: 10,
+        100: 10.15,
+        110: 10.64
     }),
     (360, 2, 10, {
         340: 29.24,
@@ -91,9 +91,48 @@ def test_max_wind_grid_makes_proper_wind_buckets(ref_hdg, num, max_tail, max_cro
     })
 ])
 def test_max_wind_grid_makes_proper_wind_returns_when_xwind_exceeded(ref_hdg, num, max_cross, expected):
-    max_tail = 1000
-    result_dict = max_wind_grid(ref_hdg, num, max_tail=max_tail, max_cross=max_cross, increment=10)
+    result_dict = max_wind_grid(ref_hdg, num, max_tail=0, max_cross=max_cross, increment=10)
     assert all([
         expected[k] == pytest.approx(result_dict[k], rel=.01) for k in expected
-    ])
+    ]), result_dict
     assert expected.keys() == result_dict.keys()
+    
+    
+@pytest.mark.parametrize('ref_hdg, num, max_tail, expected', [
+	(360, 1, 10, {
+		350: -1,
+		000: -1, 
+		10: -1
+	}),
+	])
+def test_max_wind_grid_returns_neg_one_for_each_incalculable_tail_wind(ref_hdg, num, max_tail, expected):
+	results = max_wind_grid(ref_hdg, num, max_tail=max_tail, increment=10)
+	assert all([
+		expected[k] == pytest.approx(results[k], rel=.01) for k in expected
+		]), results
+	assert list(expected.keys()) == list(results.keys())
+	
+
+@pytest.mark.parametrize('ref_hdg, num, max_tail, max_cross, runway, increment, expected', [
+	(90, 1, 10, 20, 360, 10, {
+		80: 20.31,
+		90: 20, 
+		100: 20.31,
+	}),
+	(150, 1, 15, 15, 360, 20, {
+		130: 19.58,
+		150: 17.32,
+		170: 15.23,
+	}),
+	(135, 1, 10, 10, 360, 45, {
+		90: 10,
+		135: 14.14,
+		180: 10, 
+	})
+])
+def test_max_wind_grid_returns_for_both_crosswind_and_tailwind(ref_hdg, num, max_tail, max_cross, runway, increment, expected):
+	results = max_wind_grid(ref_hdg, num, max_tail=max_tail, max_cross=max_cross, increment=increment, runway_hdg=runway)
+	assert all([
+		expected[k] == pytest.approx(results[k], rel=.01) for k in expected
+		]), results
+	assert list(expected.keys()) == list(results.keys())

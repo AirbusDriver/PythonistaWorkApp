@@ -55,19 +55,22 @@ def get_max_tailwind_velocity(max_component, wind_dir, runway=360):
             return -1
 
 
-def max_wind_grid(reference_hdg, num, max_tail=0, max_cross=0, increment=10):
+def max_wind_grid(wind_hdg,
+                  num,
+                  max_tail=0,
+                  max_cross=0,
+                  increment=10,
+                  runway_hdg=360):
     try:
-        assert any([
-            max_tail, max_cross
-        ])
+        assert any([max_tail, max_cross])
     except AssertionError as e:
         raise ValueError('must provide either max_tail or max_cross')
-    left_bucket = (reference_hdg - (num * increment)) % 360
-    right__bucket = ((reference_hdg) + (num * increment)) % 360
+    left_bucket = (wind_hdg - (num * increment)) % 360
+    right_bucket = ((wind_hdg) + (num * increment)) % 360
     buckets = []
     idx = left_bucket - increment
     idx %= 360
-    while idx != right__bucket:
+    while idx != right_bucket:
         idx += increment
         idx %= 360
         buckets.append(idx)
@@ -75,8 +78,24 @@ def max_wind_grid(reference_hdg, num, max_tail=0, max_cross=0, increment=10):
     out = {}
 
     for theta in buckets:
-        max_xwind = get_max_crosswind_velocity(max_cross, theta, reference_hdg)
-        out[theta] = max_xwind
+        if max_cross:
+            max_xwind = get_max_crosswind_velocity(max_cross, theta,
+                                                   runway_hdg)
+        else:
+            max_xwind = -1
+        if max_tail:
+            max_twind = get_max_tailwind_velocity(max_tail, theta, runway_hdg)
+        else:
+            max_twind = -1
+        max_velocity = -1
+
+        if max_xwind != -1:
+            max_velocity = max_xwind
+        if max_twind != -1:
+            if max_twind < max_velocity:
+                max_velocity = max_twind
+
+        out[theta] = max_velocity
 
     return out
 
@@ -103,18 +122,17 @@ class WindCalculator():
         return get_headwind(wind_dir, velocity, self.runway_heading)
 
     def calculate_max_tailwind_velocity(self, wind_dir):
-        return get_max_tailwind_velocity(self.max_tailwind, wind_dir, self.runway_heading)
+        return get_max_tailwind_velocity(self.max_tailwind, wind_dir,
+                                         self.runway_heading)
 
     def winds(self, wind_dir, velocity):
         return get_winds(wind_dir, velocity, self.runway_heading)
 
 
 class WindShell(cmd.Cmd):
-    intro = (
-        'Welcome to the wind calculator, \n'
-        'Enter "help" for more info.\n'
-        '================================='
-    )
+    intro = ('Welcome to the wind calculator, \n'
+             'Enter "help" for more info.\n'
+             '=================================')
     prompt = '-> '
 
     def preloop(self):
@@ -169,12 +187,16 @@ class WindShell(cmd.Cmd):
             if result == -1:
                 raise ValueError
         except ValueError as e:
-            print(f'No maximum tailwind from {args[0]}° in reference to runway/angle {self.wind_calc.runway_heading}°')
+            print(
+                f'No maximum tailwind from {args[0]}° in reference to runway/angle {self.wind_calc.runway_heading}°'
+            )
         except Exception as e:
             print(e)
             print(f'args -> {args}')
         else:
-            print(f'Max Tailwind from {args[0]}° for reference angle {self.wind_calc.runway_heading}° -> {result:.1f}')
+            print(
+                f'Max Tailwind from {args[0]}° for reference angle {self.wind_calc.runway_heading}° -> {result:.1f}'
+            )
 
     def do_winds(self, line):
         """winds wind_direction velocity"""
@@ -189,8 +211,7 @@ class WindShell(cmd.Cmd):
             s = Template(
                 '\nWind Components for $wind_dir° @ ${velocity}kts from HDG: $hdg\n\n'
                 'Crosswind: $l_or_r $xwind\n'
-                '${h_or_t}wind: $hwind\n'
-            )
+                '${h_or_t}wind: $hwind\n')
             vals = {
                 'wind_dir': args[0],
                 'velocity': args[1],
@@ -214,3 +235,4 @@ class WindShell(cmd.Cmd):
 if __name__ == '__main__':
     shell = WindShell()
     shell.cmdloop()
+
