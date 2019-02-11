@@ -6,6 +6,10 @@ from string import Template
 
 Wind = namedtuple('Wind', ['h_wind', 'x_wind'])
 
+MAX_XWIND = 38
+MAX_TO_TAILWIND = 15
+MAX_LAND_TAILWIND = 10
+
 
 def get_winds(wind, velocity, runway=360):
     """Return Wind(h_wind, x_wind) tuple."""
@@ -110,8 +114,9 @@ def max_wind_grid(wind_hdg,
 class WindCalculator():
     def __init__(self):
         self._runway_heading = 000
-        self.max_crosswind = 38
-        self.max_tailwind = 15
+        self.max_crosswind = MAX_XWIND
+        self.max_to_tailwind = MAX_TO_TAILWIND
+        self.max_ldg_tailwind = MAX_LAND_TAILWIND
 
     @property
     def runway_heading(self):
@@ -128,8 +133,11 @@ class WindCalculator():
     def calculate_headwind(self, wind_dir, velocity):
         return get_headwind(wind_dir, velocity, self.runway_heading)
 
-    def calculate_max_tailwind_velocity(self, wind_dir):
-        return get_max_tailwind_velocity(self.max_tailwind, wind_dir,
+    def calculate_max_tailwind_velocity(self, wind_dir, landing=False):
+        if landing:
+            return get_max_tailwind_velocity(self.max_ldg_tailwind, wind_dir,
+                                             self.runway_heading)
+        return get_max_tailwind_velocity(self.max_to_tailwind, wind_dir,
                                          self.runway_heading)
 
     def winds(self, wind_dir, velocity):
@@ -147,7 +155,8 @@ class WindShell(cmd.Cmd):
 
     def do_r(self, line):
         """r(runway) heading
-            Show runway if no argument provided, or set runway heading"""
+
+        Show runway if no argument provided, or set runway heading"""
         if line:
             self.wind_calc.runway_heading = float(line)
         print(f'Runway set to: {self.wind_calc.runway_heading:3.1f}°')
@@ -155,10 +164,47 @@ class WindShell(cmd.Cmd):
     def emptyline(self):
         self.do_show(None)
 
+    def do_set(self, line):
+        """set [r[unway] | x[wind] | to[tail] | ldg[tail] value
+        set runway, xwind, takeoff tailwind, or landing tailwind limits
+        """
+        args = self._parse_line(line)
+        props = {
+            'r': 'runway_heading',
+            'x': 'max_crosswind',
+            'to': 'max_to_tailwind',
+            'ldg': 'max_ldg_tailwind',
+        }
+        try:
+            attr = props[args[0]]
+            val = args[1]
+        except IndexError:
+            print(f'invalid args')
+            self.onecmd('?set')
+        except KeyError:
+            print(f'invalid entry, nothing changed')
+            self.do_show('')
+        else:
+            try:
+                setattr(self.wind_calc, attr, val)
+            except Exception as e:
+                print(f'ERROR!! {e}')
+            finally:
+                print(f'NO CHANGES MADE')
+                self.do_show('')
+
     def do_show(self, line):
         """show
-        display the runway heading"""
-        print(f'Runway Heading: {self.wind_calc.runway_heading}°')
+
+        display the runway heading, max xwind, max takeoff tailwind, max landing tailwind"""
+
+        s = f"""
+        RWY HDG [set r]:        {self.wind_calc.runway_heading}º
+        MAX XWIND [set x]:      {self.wind_calc.max_crosswind}kts
+        MAX TO TAIL [set to]:   {self.wind_calc.max_to_tailwind}kts 
+        MAX LDG TAIL [set ldg]:  {self.wind_calc.max_ldg_tailwind}kts
+        """
+        print(s)
 
     def do_x(self, line):
         """x(crosswind) wind_direction velocity
@@ -187,10 +233,19 @@ class WindShell(cmd.Cmd):
             print(f'{flag} {abs(result):.1f}kts')
 
     def do_maxt(self, line):
-        """maxt(ailwind) wind_dir"""
-        args = self._cast_float(line)
+        """maxt(ailwind) wind_dir [l]"""
         try:
-            result = self.wind_calc.calculate_max_tailwind_velocity(*args)
+            args = line.split()
+            landing_calc = True if args[-1] == 'l' else False
+            wind_dir = float(args[0])
+            calc_type = f'Landing Calculation (limit: {self.wind_calc.max_ldg_tailwind:1.1f} kts)' if landing_calc \
+                else f'Takeoff Calculation (limit: {self.wind_calc.max_to_tailwind:1.1f} kts)'
+        except IndexError as e:
+            self.onecmd('?maxt')
+            return
+        try:
+            result = self.wind_calc.calculate_max_tailwind_velocity(wind_dir, landing=landing_calc)
+            print(calc_type)
             if result == -1:
                 raise ValueError
         except ValueError as e:
