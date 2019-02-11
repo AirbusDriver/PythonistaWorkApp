@@ -1,6 +1,6 @@
 from math import degrees, radians
 import math
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 import cmd
 from string import Template
 
@@ -81,7 +81,7 @@ def max_wind_grid(wind_hdg,
         idx %= 360
         buckets.append(idx)
 
-    out = {}
+    out = OrderedDict()
 
     for theta in buckets:
 
@@ -189,8 +189,8 @@ class WindShell(cmd.Cmd):
                 setattr(self.wind_calc, attr, val)
             except Exception as e:
                 print(f'ERROR!! {e}')
-            finally:
                 print(f'NO CHANGES MADE')
+            finally:
                 self.do_show('')
 
     def do_show(self, line):
@@ -284,6 +284,65 @@ class WindShell(cmd.Cmd):
                 'l_or_r': 'L' if results.x_wind < 0 else 'R'
             }
             print(s.safe_substitute(vals))
+
+    def do_grid(self, line):
+        """
+        grid wind_dir [l(anding calculation]
+
+        Show max wind with respect to both x-wind and t/h-wind limits for a range of wind
+        directions around 'wind_dir'
+        """
+        args = line.split()
+        try:
+            args[-1].lower() == 'l'
+        except (IndexError, AttributeError):
+            landing_calc = False
+        else:
+            landing_calc = True
+
+        try:
+            wind_dir = int(args[0])
+        except Exception as e:
+            print(e)
+            self.onecmd('?grid')
+            return
+
+        ldg_or_head = f'Landing ({self.wind_calc.max_ldg_tailwind} kts)' if landing_calc \
+            else f'Takeoff ({self.wind_calc.max_to_tailwind} kts)'
+        self.onecmd('show')
+        print('{: ^50}'.format(f'Using {ldg_or_head} for calculation'))
+        print()
+
+        t_wind_limit = self.wind_calc.max_ldg_tailwind if landing_calc else self.wind_calc.max_to_tailwind
+        max_cross = self.wind_calc.max_crosswind
+        rwy_hdg = self.wind_calc.runway_heading
+        grid = max_wind_grid(wind_dir, 2, t_wind_limit, max_cross, 10, rwy_hdg)
+
+        def make_col(hdg, val, left_most=False):
+            first_char = '|' if left_most else ' '
+            header = f'{first_char}  {str(hdg).zfill(3)}º  |'
+            if isinstance(val, (float, int)):
+                val_str = f'{first_char}{val: ^4.1f} kts|'
+            else:
+                val_str = f"{first_char}{val: ^8}|"
+            out = '\n'.join([header, val_str])
+            return header, val_str
+
+        headers = []
+        val_strs = []
+
+        for i, h_v in enumerate(grid.items()):
+            hdg, val = h_v
+            out_val = val if val != -1 else 'N/A'
+            first = (i == 0)
+            header, val_str = make_col(hdg, val, first)
+            headers.append(header)
+            val_strs.append(val_str)
+
+        hdr_str = ''.join(headers)
+        print(hdr_str)
+        print('-' * len(hdr_str))
+        print(''.join(val_strs))
 
     @staticmethod
     def _parse_line(line):
