@@ -235,4 +235,3 @@ class WindShell(cmd.Cmd):
 if __name__ == '__main__':
     shell = WindShell()
     shell.cmdloop()
-
