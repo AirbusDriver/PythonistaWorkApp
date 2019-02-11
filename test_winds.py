@@ -50,7 +50,7 @@ def test_get_max_crosswind_velocity(max_xwind, wind_dir, runway, expected):
     (10, 90, 80),
     (10, 340, 360),
 ])
-def test_get_max_tailwind_returns_neg_one_for_lessthan_ninety(max_tailwind, wind_dir, runway):
+def test_get_max_tailwind_returns_neg_one_for_less_than_ninety(max_tailwind, wind_dir, runway):
     assert -1 == get_max_tailwind_velocity(max_tailwind, wind_dir, runway)
 
 
@@ -91,7 +91,7 @@ def test_max_wind_grid_makes_proper_wind_buckets(ref_hdg, num, max_tail, max_cro
     })
 ])
 def test_max_wind_grid_makes_proper_wind_returns_when_xwind_exceeded(ref_hdg, num, max_cross, expected):
-    result_dict = max_wind_grid(ref_hdg, num, max_tail=0, max_cross=max_cross, increment=10)
+    result_dict = max_wind_grid(ref_hdg, num, max_cross=max_cross, increment=10)
     assert all([
         expected[k] == pytest.approx(result_dict[k], rel=.01) for k in expected
     ]), result_dict
@@ -128,12 +128,41 @@ def test_max_wind_grid_returns_neg_one_for_each_incalculable_tail_wind(ref_hdg, 
         90: 10,
         135: 14.14,
         180: 10,
-    })
-])
+    }),
+    (180, 2, 5, 500, 90, 10, {
+        160: 532.09,
+        170: 507.7,
+        180: 500,
+        190: 28.79,
+        200: 14.62
+    }),
+], ids=['xwind limited', 'twind limited', 'range limited by both', 'severely twind limited'])
 def test_max_wind_grid_returns_for_both_crosswind_and_tailwind(ref_hdg, num, max_tail, max_cross, runway, increment,
                                                                expected):
     results = max_wind_grid(ref_hdg, num, max_tail=max_tail, max_cross=max_cross, increment=increment,
                             runway_hdg=runway)
+    assert all([
+        expected[k] == pytest.approx(results[k], rel=.01) for k in expected
+    ]), results
+    assert list(expected.keys()) == list(results.keys())
+
+
+@pytest.mark.parametrize('ref_hdg, num, max_tail, max_cross, runway_hdg, increment, expected', [
+    (90, 3, 10, -1, 360, 10, {
+        60: -1,
+        70: -1,
+        80: -1,
+        90: -1,
+        100: 57.59,
+        110: 29.24,
+        120: 20
+    }),
+
+], ids=['only tail calc'])
+def test_max_wind_grid_returns_when_only_one_max_wind_specified(ref_hdg, num, max_tail, max_cross, runway_hdg,
+                                                                increment,
+                                                                expected):
+    results = max_wind_grid(ref_hdg, num, max_tail, max_cross, increment, runway_hdg)
     assert all([
         expected[k] == pytest.approx(results[k], rel=.01) for k in expected
     ]), results

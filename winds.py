@@ -57,12 +57,14 @@ def get_max_tailwind_velocity(max_component, wind_dir, runway=360):
 
 def max_wind_grid(wind_hdg,
                   num,
-                  max_tail=0,
-                  max_cross=0,
+                  max_tail=-1,
+                  max_cross=-1,
                   increment=10,
                   runway_hdg=360):
     try:
-        assert any([max_tail, max_cross])
+        find_xwind = True if max_cross >= 0 else False
+        find_twind = True if max_tail >= 0 else False
+        assert any([find_twind, find_xwind])
     except AssertionError as e:
         raise ValueError('must provide either max_tail or max_cross')
     left_bucket = (wind_hdg - (num * increment)) % 360
@@ -78,24 +80,29 @@ def max_wind_grid(wind_hdg,
     out = {}
 
     for theta in buckets:
-        if max_cross:
-            max_xwind = get_max_crosswind_velocity(max_cross, theta,
-                                                   runway_hdg)
-        else:
-            max_xwind = -1
-        if max_tail:
-            max_twind = get_max_tailwind_velocity(max_tail, theta, runway_hdg)
-        else:
-            max_twind = -1
-        max_velocity = -1
 
-        if max_xwind != -1:
-            max_velocity = max_xwind
-        if max_twind != -1:
-            if max_twind < max_velocity:
-                max_velocity = max_twind
+        if find_xwind:
+            max_xwind_velocity = get_max_crosswind_velocity(max_cross, theta, runway_hdg)
+            if not find_twind:
+                out[theta] = max_xwind_velocity
+                continue
+        else:
+            max_xwind_velocity = -1
 
-        out[theta] = max_velocity
+        if find_twind:
+            max_twind_velocity = get_max_tailwind_velocity(max_tail, theta, runway_hdg)
+            if not find_xwind:
+                out[theta] = max_twind_velocity
+                continue
+        else:
+            max_twind_velocity = -1
+
+        # both requested both calculable
+        if max_twind_velocity != -1 and max_xwind_velocity != -1:
+            out[theta] = min(max_xwind_velocity, max_twind_velocity)
+            continue
+        else:
+            out[theta] = max(max_twind_velocity, max_xwind_velocity)
 
     return out
 
