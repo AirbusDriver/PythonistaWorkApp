@@ -7,28 +7,14 @@ import cmd
 from string import Template
 import logging
 from functools import wraps
+import argparse
 
-DEBUG_MODE = False
-
-log_level = logging.DEBUG if DEBUG_MODE else logging.ERROR
-
-logger = logging.getLogger('WIND CLI')
-console_handler = logging.StreamHandler()
-
-log_formatter = logging.Formatter('[{asctime!s}]-[{name!s}]-[{levelname!s}]: {message!s}', style='{')
-console_handler.setFormatter(log_formatter)
-
-logger.addHandler(console_handler)
-
-logger.setLevel(log_level)
 
 Wind = namedtuple('Wind', ['h_wind', 'x_wind'])
 
 MAX_XWIND = 38
 MAX_TO_TAILWIND = 15
 MAX_LAND_TAILWIND = 10
-
-logger.info(f'Begin {__file__}')
 
 
 def get_winds(wind, velocity, runway=360):
@@ -139,7 +125,7 @@ def catch_and_log_error(func):
         except Exception as e:
             logger.debug(f"Error in `{func.__name__}(args: {args}, kwargs: {kwargs})`")
             logger.debug(f'Exc info: {str(e)}')
-            print(f'Error Occured!!')
+            print(f'Error Occurred!!')
             try:
                 stripped_cmd = func.__name__.replace('do_', '')
                 print(f"Showing help for {stripped_cmd}")
@@ -458,5 +444,24 @@ class WindShell(cmd.Cmd):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-d', '--debug', help='run CLI tool with DEBUG_MODE=TRUE', action='store_true', default=False)
+
+    args = parser.parse_args()
+
+    DEBUG_MODE = args.debug
+
+    log_level = logging.DEBUG if DEBUG_MODE else logging.ERROR
+
+    logger = logging.getLogger('WIND CLI')
+    console_handler = logging.StreamHandler()
+
+    log_formatter = logging.Formatter('[{asctime!s}]-[{name!s}]-[{levelname!s}]: {message!s}', style='{')
+    console_handler.setFormatter(log_formatter)
+
+    logger.addHandler(console_handler)
+
+    logger.setLevel(log_level)
+
     shell = WindShell()
     shell.cmdloop()
