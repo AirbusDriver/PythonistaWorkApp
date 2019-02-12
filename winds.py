@@ -7,8 +7,14 @@ import cmd
 from string import Template
 import logging
 from functools import wraps
+import argparse
 
-DEBUG_MODE = False
+parser = argparse.ArgumentParser()
+parser.add_argument('-d', '--debug', help='run CLI tool with DEBUG_MODE=TRUE', action='store_true', default=False)
+
+args = parser.parse_args()
+
+DEBUG_MODE = args.debug
 
 log_level = logging.DEBUG if DEBUG_MODE else logging.ERROR
 
@@ -139,7 +145,7 @@ def catch_and_log_error(func):
         except Exception as e:
             logger.debug(f"Error in `{func.__name__}(args: {args}, kwargs: {kwargs})`")
             logger.debug(f'Exc info: {str(e)}')
-            print(f'Error Occured!!')
+            print(f'Error Occurred!!')
             try:
                 stripped_cmd = func.__name__.replace('do_', '')
                 print(f"Showing help for {stripped_cmd}")
