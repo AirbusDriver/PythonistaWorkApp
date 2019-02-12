@@ -1,4 +1,6 @@
-from math import degrees, radians
+#! /usr/local/bin/python3.6
+
+from math import radians
 import math
 from collections import namedtuple, OrderedDict
 import cmd
@@ -145,18 +147,23 @@ class WindCalculator():
 
 
 class WindShell(cmd.Cmd):
-    intro = ('Welcome to the wind calculator, \n'
-             'Enter "help" for more info.\n'
-             '=================================')
+    intro = """
+            Welcome to the wind calculator!
+            
+            Enter "help [command]" for more info..
+            ======================================
+            """
     prompt = '-> '
 
     def preloop(self):
         self.wind_calc = WindCalculator()
 
     def do_r(self, line):
-        """r(runway) heading
+        """
+        r(runway) heading
 
-        Show runway if no argument provided, or set runway heading"""
+        Show runway if no argument provided, or set runway heading
+        """
         if line:
             self.wind_calc.runway_heading = float(line)
         print(f'Runway set to: {self.wind_calc.runway_heading:3.1f}°')
@@ -165,8 +172,16 @@ class WindShell(cmd.Cmd):
         self.do_show(None)
 
     def do_set(self, line):
-        """set [r[unway] | x[wind] | to[tail] | ldg[tail] value
+        """
+        set [r[unway] | x[wind] | to[tail] | ldg[tail] value
+
         set runway, xwind, takeoff tailwind, or landing tailwind limits
+
+        Example:
+
+            `set x 15`
+
+                Set the maximum value for all future crosswind calculations to 15.
         """
         args = self._parse_line(line)
         props = {
@@ -194,15 +209,17 @@ class WindShell(cmd.Cmd):
                 self.do_show('')
 
     def do_show(self, line):
-        """show
+        """
+        show
 
-        display the runway heading, max xwind, max takeoff tailwind, max landing tailwind"""
+        display the runway heading, max xwind, max takeoff tailwind, max landing tailwind
+        """
 
         s = f"""
         RWY HDG [set r]:        {self.wind_calc.runway_heading}º
-        MAX XWIND [set x]:      {self.wind_calc.max_crosswind}kts
-        MAX TO TAIL [set to]:   {self.wind_calc.max_to_tailwind}kts 
-        MAX LDG TAIL [set ldg]:  {self.wind_calc.max_ldg_tailwind}kts
+        MAX XWIND [set x]:      {self.wind_calc.max_crosswind} kts
+        MAX TO TAIL [set to]:   {self.wind_calc.max_to_tailwind} kts 
+        MAX LDG TAIL [set ldg]: {self.wind_calc.max_ldg_tailwind} kts
         """
         print(s)
 
@@ -220,8 +237,15 @@ class WindShell(cmd.Cmd):
             print(f'{prefix} {abs(result):.1f}kts')
 
     def do_h(self, line):
-        """h(eadwind) wind_direction velocity
-        calculate head/tailwind component in reference to runway"""
+        """
+        h(eadwind) wind_direction velocity
+
+        calculate head/tailwind component in reference to runway
+
+        Example:
+
+            `h 70 20` -> "HEADWIND 6.8 kts"
+        """
         args = self._cast_float(line)
         try:
             result = self.wind_calc.calculate_headwind(*args)
@@ -230,10 +254,15 @@ class WindShell(cmd.Cmd):
             print(f'args -> {args}')
         else:
             flag = 'TAILWIND' if result < 0 else 'HEADWIND'
-            print(f'{flag} {abs(result):.1f}kts')
+            print(f'{flag} {abs(result):.1f} kts')
 
     def do_maxt(self, line):
-        """maxt(ailwind) wind_dir [l]"""
+        """
+        maxt(ailwind) wind_dir [l]
+
+        Calculate the maximum wind velocity acceptable without exceeding tailwind limit. If `l` is passed,
+        used the landing tailwind limitation.
+        """
         try:
             args = line.split()
             landing_calc = True if args[-1] == 'l' else False
@@ -261,7 +290,21 @@ class WindShell(cmd.Cmd):
             )
 
     def do_winds(self, line):
-        """winds wind_direction velocity"""
+        """
+        winds wind_direction velocity
+
+        Use the current runway heading and calculate both the headwind/tailwind and the crosswind values
+        from a given wind direction and velocity.
+
+        Example:
+
+            (runway 360º)
+
+            `winds 40 20`
+
+            Crosswind: R 12.9
+            Headwind: 15.3
+        """
         args = self._cast_float(line)
         try:
             result = self.wind_calc.winds(*args)
@@ -290,15 +333,26 @@ class WindShell(cmd.Cmd):
         grid wind_dir [l(anding calculation]
 
         Show max wind with respect to both x-wind and t/h-wind limits for a range of wind
-        directions around 'wind_dir'
+        directions around 'wind_dir'. If 'l' is passed, use the landing limitation for the
+        calculations.
+
+            -> r 90 l
+            Runway set to: 90º
+            -> grid 200 l
+
+                RWY HDG [set r]:        90º
+                MAX XWIND [set x]:      38kts
+                MAX TO TAIL [set to]:   15kts
+                MAX LDG TAIL [set ldg]: 10kts
+
+            Using Landing (10 kts) for calculation
+
+        |   180º  |   190º   |   200º   |   210º  |   220º   |
+        ------------------------------------------------------
+        |38.0 kts | 38.6 kts | 29.2 kts | 20.0 kts|  15.6 kts|
         """
         args = line.split()
-        try:
-            args[-1].lower() == 'l'
-        except (IndexError, AttributeError):
-            landing_calc = False
-        else:
-            landing_calc = True
+        landing_calc = 'l' in args
 
         try:
             wind_dir = int(args[0])
@@ -343,6 +397,12 @@ class WindShell(cmd.Cmd):
         print(hdr_str)
         print('-' * len(hdr_str))
         print(''.join(val_strs))
+
+    def do_exit(self, line):
+        """
+        Quit using this stupid thing.
+        """
+        return True
 
     @staticmethod
     def _parse_line(line):
