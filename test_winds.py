@@ -182,6 +182,18 @@ def test_max_wind_grid_returns_when_only_one_max_wind_specified(ref_hdg, num, ma
     assert list(expected.keys()) == list(results.keys())
 
 
+class TestWindCalculator:
+    @pytest.mark.parametrize('property, setter_val, expected_on_call', [
+        ('max_ldg_tailwind', '50', 50.0),
+        ('max_to_tailwind', 4, 4.0),
+        ('max_crosswind', 25.5, 25.5)
+    ])
+    def test_wind_calculator_properties(self, property, setter_val, expected_on_call):
+        wind_calc = WindCalculator()
+        setattr(wind_calc, property, setter_val)
+        assert expected_on_call == getattr(wind_calc, property)
+
+
 @pytest.mark.usefixtures('mock_wind_calc_shell')
 class TestWindShell:
 

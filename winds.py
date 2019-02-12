@@ -152,12 +152,12 @@ def catch_and_log_error(func):
     return _wrapper
 
 
-class WindCalculator():
+class WindCalculator:
     def __init__(self):
         self._runway_heading = 000
-        self.max_crosswind = MAX_XWIND
-        self.max_to_tailwind = MAX_TO_TAILWIND
-        self.max_ldg_tailwind = MAX_LAND_TAILWIND
+        self._max_crosswind = MAX_XWIND
+        self._max_to_tailwind = MAX_TO_TAILWIND
+        self._max_ldg_tailwind = MAX_LAND_TAILWIND
 
     @property
     def runway_heading(self):
@@ -166,6 +166,30 @@ class WindCalculator():
     @runway_heading.setter
     def runway_heading(self, val):
         self._runway_heading = float(val)
+
+    @property
+    def max_crosswind(self):
+        return self._max_crosswind
+
+    @max_crosswind.setter
+    def max_crosswind(self, val):
+        self._max_crosswind = float(val)
+
+    @property
+    def max_to_tailwind(self):
+        return self._max_to_tailwind
+
+    @max_to_tailwind.setter
+    def max_to_tailwind(self, val):
+        self._max_to_tailwind = float(val)
+
+    @property
+    def max_ldg_tailwind(self):
+        return self._max_ldg_tailwind
+
+    @max_ldg_tailwind.setter
+    def max_ldg_tailwind(self, val):
+        self._max_ldg_tailwind = float(val)
 
     def calculate_crosswind(self, wind_dir, velocity):
         result = get_crosswind(wind_dir, velocity, self.runway_heading)
@@ -200,7 +224,6 @@ class WindShell(cmd.Cmd):
 
     def __repr__(self):
         return f"WindShell Instance"
-
 
     @catch_and_log_error
     def do_r(self, line):
@@ -239,7 +262,7 @@ class WindShell(cmd.Cmd):
                 'ldg': 'max_ldg_tailwind',
             }
             attr = props[args[0]]
-            val = args[1]
+            val = float(args[1])
 
             setattr(self.wind_calc, attr, val)
         except Exception as e:
