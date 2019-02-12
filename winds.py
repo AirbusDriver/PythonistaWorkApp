@@ -8,7 +8,7 @@ from string import Template
 import logging
 from functools import wraps
 
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 log_level = logging.DEBUG if DEBUG_MODE else logging.ERROR
 
@@ -137,11 +137,11 @@ def catch_and_log_error(func):
         try:
             result = func(*args, **kwargs)
         except Exception as e:
-            logger.error(f"Error in `{func.__name__}(args: {args}, kwargs: {kwargs})`")
-            logger.error(f'Exc info: {str(e)}')
+            logger.debug(f"Error in `{func.__name__}(args: {args}, kwargs: {kwargs})`")
+            logger.debug(f'Exc info: {str(e)}')
             print(f'Error Occured!!')
             try:
-                stripped_cmd = func.__name__.strip('do_')
+                stripped_cmd = func.__name__.replace('do_', '')
                 print(f"Showing help for {stripped_cmd}")
                 args[0].onecmd(f"?{stripped_cmd}")
             except Exception:
@@ -376,7 +376,7 @@ class WindShell(cmd.Cmd):
         ------------------------------------------------------
         |38.0 kts | 38.6 kts | 29.2 kts | 20.0 kts|  15.6 kts|
         """
-        args = line.split()
+        args = line.split(' ')
         landing_calc = 'l' in args
 
         wind_dir = int(args[0])
