@@ -230,3 +230,10 @@ class TestWindShell:
         shell.wind_calc.calculate_headwind.assert_called_with(0, headwind_return)
         out, err = capsys.readouterr()
         assert flags.get(expected_flag) in out
+
+    def test_do_reset_calls_reset_with_no_args(self, mock_wind_calc_shell):
+        shell = mock_wind_calc_shell
+        shell.wind_calc.reset_all.return_value = None
+        shell.onecmd('reset')
+        shell.wind_calc.reset_all.assert_called_with()
+

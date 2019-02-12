@@ -285,6 +285,15 @@ class WindShell(cmd.Cmd):
         print(s)
 
     @catch_and_log_error
+    def do_reset(self, line):
+        """
+        reset
+
+        reset all maximum wind velocities to their original values
+        """
+        self.wind_calc.reset_all()
+
+    @catch_and_log_error
     def do_x(self, line):
         """x(crosswind) wind_direction velocity
         calculate crosswind component in reference to runway angle"""
