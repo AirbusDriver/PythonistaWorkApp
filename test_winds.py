@@ -1,4 +1,5 @@
 from mock import Mock
+import mock
 
 import pytest
 
@@ -192,6 +193,21 @@ class TestWindCalculator:
         wind_calc = WindCalculator()
         setattr(wind_calc, property, setter_val)
         assert expected_on_call == getattr(wind_calc, property)
+
+    @pytest.mark.parametrize('attr, val, glob', [
+        ('max_crosswind', 20, 'MAX_XWIND'),
+        ('max_to_tailwind', 5, 'MAX_TO_TAILWIND'),
+        ('max_ldg_tailwind', 15, 'MAX_LAND_TAILWIND')
+    ])
+    def test_wind_calculator_resets_to_module_defaults(self, attr, val, glob):
+        with mock.patch('winds.' + glob, val):
+            wind_calc = WindCalculator()
+            assert val == getattr(wind_calc, attr)
+            new_val = val ** 2
+            setattr(wind_calc, attr, new_val)
+            assert getattr(wind_calc, attr) == new_val
+            wind_calc.reset_all()
+            assert val == getattr(wind_calc, attr)
 
 
 @pytest.mark.usefixtures('mock_wind_calc_shell')

@@ -9,7 +9,6 @@ import logging
 from functools import wraps
 import argparse
 
-
 Wind = namedtuple('Wind', ['h_wind', 'x_wind'])
 
 MAX_XWIND = 38
@@ -139,11 +138,13 @@ def catch_and_log_error(func):
 
 
 class WindCalculator:
+
     def __init__(self):
         self._runway_heading = 000
-        self._max_crosswind = MAX_XWIND
-        self._max_to_tailwind = MAX_TO_TAILWIND
-        self._max_ldg_tailwind = MAX_LAND_TAILWIND
+        self._max_ldg_tailwind = 0
+        self._max_to_tailwind = 0
+        self._max_crosswind = 0
+        self.reset_all()
 
     @property
     def runway_heading(self):
@@ -193,6 +194,15 @@ class WindCalculator:
 
     def winds(self, wind_dir, velocity):
         return get_winds(wind_dir, velocity, self.runway_heading)
+
+    def reset_all(self):
+        DEFAULTABLE = {
+            'max_crosswind': MAX_XWIND,
+            'max_to_tailwind': MAX_TO_TAILWIND,
+            'max_ldg_tailwind': MAX_LAND_TAILWIND
+        }
+        for attr, val in DEFAULTABLE.items():
+            setattr(self, attr, val)
 
 
 class WindShell(cmd.Cmd):
