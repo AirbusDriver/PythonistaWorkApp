@@ -13,7 +13,7 @@ range of directions.
 Installation
 ------------
 
-The app is currently best installed with ``git clone`` or just grab one of the zip/tar.gz
+The app is currently best installed with ``git clone https://github.com/AirbusDriver/PythonistaWorkApp.git`` or just grab one of the zip/tar.gz
 bundles in the [Release](https://github.com/AirbusDriver/PythonistaWorkApp/releases) section
 of this repo. 
 
