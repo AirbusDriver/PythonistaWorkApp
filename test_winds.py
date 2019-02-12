@@ -1,7 +1,20 @@
+from mock import Mock
+
 import pytest
 
 from winds import (get_headwind, get_crosswind, get_winds, Wind, get_max_crosswind_velocity,
-                   get_max_tailwind_velocity, max_wind_grid)
+                   get_max_tailwind_velocity, max_wind_grid, WindCalculator, WindShell, catch_and_log_error)
+
+
+@pytest.fixture('class')
+def mock_wind_calc_shell():
+    mock_calculator = Mock()
+
+    windshell = WindShell()
+
+    windshell.wind_calc = mock_calculator
+
+    return windshell
 
 
 @pytest.mark.parametrize('_input, expected', [
@@ -167,3 +180,25 @@ def test_max_wind_grid_returns_when_only_one_max_wind_specified(ref_hdg, num, ma
         expected[k] == pytest.approx(results[k], rel=.01) for k in expected
     ]), results
     assert list(expected.keys()) == list(results.keys())
+
+
+@pytest.mark.usefixtures('mock_wind_calc_shell')
+class TestWindShell:
+
+    @pytest.mark.parametrize('headwind_return, expected_flag', [
+        (0, 'H'),
+        (-10, 'T'),
+        (10, 'H'),
+    ], ids=['Zero Wind -> H flag', 'Tailwind -> T flag', 'Headwind -> H flag'])
+    def test_do_h_has_proper_flag(self, headwind_return, expected_flag, mock_wind_calc_shell, capsys):
+        flags = {
+            'H': 'HEADWIND',
+            'T': 'TAILWIND'
+        }
+        line = ' '.join([str(0), str(headwind_return)])
+        shell = mock_wind_calc_shell
+        shell.wind_calc.calculate_headwind.return_value = headwind_return
+        shell.do_h(line)
+        shell.wind_calc.calculate_headwind.assert_called_with(0, headwind_return)
+        out, err = capsys.readouterr()
+        assert flags.get(expected_flag) in out

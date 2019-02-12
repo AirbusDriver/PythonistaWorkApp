@@ -5,12 +5,30 @@ import math
 from collections import namedtuple, OrderedDict
 import cmd
 from string import Template
+import logging
+from functools import wraps
+
+DEBUG_MODE = True
+
+log_level = logging.DEBUG if DEBUG_MODE else logging.ERROR
+
+logger = logging.getLogger('WIND CLI')
+console_handler = logging.StreamHandler()
+
+log_formatter = logging.Formatter('[{asctime!s}]-[{name!s}]-[{levelname!s}]: {message!s}', style='{')
+console_handler.setFormatter(log_formatter)
+
+logger.addHandler(console_handler)
+
+logger.setLevel(log_level)
 
 Wind = namedtuple('Wind', ['h_wind', 'x_wind'])
 
 MAX_XWIND = 38
 MAX_TO_TAILWIND = 15
 MAX_LAND_TAILWIND = 10
+
+logger.info(f'Begin {__file__}')
 
 
 def get_winds(wind, velocity, runway=360):
@@ -113,6 +131,27 @@ def max_wind_grid(wind_hdg,
     return out
 
 
+def catch_and_log_error(func):
+    @wraps(func)
+    def _wrapper(*args, **kwargs):
+        try:
+            result = func(*args, **kwargs)
+        except Exception as e:
+            logger.error(f"Error in `{func.__name__}(args: {args}, kwargs: {kwargs})`")
+            logger.error(f'Exc info: {str(e)}')
+            print(f'Error Occured!!')
+            try:
+                stripped_cmd = func.__name__.strip('do_')
+                print(f"Showing help for {stripped_cmd}")
+                args[0].onecmd(f"?{stripped_cmd}")
+            except Exception:
+                pass
+        else:
+            return result
+
+    return _wrapper
+
+
 class WindCalculator():
     def __init__(self):
         self._runway_heading = 000
@@ -155,9 +194,15 @@ class WindShell(cmd.Cmd):
             """
     prompt = '-> '
 
-    def preloop(self):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.wind_calc = WindCalculator()
 
+    def __repr__(self):
+        return f"WindShell Instance"
+
+
+    @catch_and_log_error
     def do_r(self, line):
         """
         r(runway) heading
@@ -168,9 +213,11 @@ class WindShell(cmd.Cmd):
             self.wind_calc.runway_heading = float(line)
         print(f'Runway set to: {self.wind_calc.runway_heading:3.1f}°')
 
+    @catch_and_log_error
     def emptyline(self):
-        self.do_show(None)
+        self.do_show('')
 
+    @catch_and_log_error
     def do_set(self, line):
         """
         set [r[unway] | x[wind] | to[tail] | ldg[tail] value
@@ -183,31 +230,26 @@ class WindShell(cmd.Cmd):
 
                 Set the maximum value for all future crosswind calculations to 15.
         """
-        args = self._parse_line(line)
-        props = {
-            'r': 'runway_heading',
-            'x': 'max_crosswind',
-            'to': 'max_to_tailwind',
-            'ldg': 'max_ldg_tailwind',
-        }
         try:
+            args = self._parse_line(line)
+            props = {
+                'r': 'runway_heading',
+                'x': 'max_crosswind',
+                'to': 'max_to_tailwind',
+                'ldg': 'max_ldg_tailwind',
+            }
             attr = props[args[0]]
             val = args[1]
-        except IndexError:
-            print(f'invalid args')
-            self.onecmd('?set')
-        except KeyError:
-            print(f'invalid entry, nothing changed')
-            self.do_show('')
-        else:
-            try:
-                setattr(self.wind_calc, attr, val)
-            except Exception as e:
-                print(f'ERROR!! {e}')
-                print(f'NO CHANGES MADE')
-            finally:
-                self.do_show('')
 
+            setattr(self.wind_calc, attr, val)
+        except Exception as e:
+            print(f'NO CHANGE OCCURED DUE TO ERROR!!!')
+            raise e
+        finally:
+            print(f"CURRENT SETTINGS")
+            self.do_show(None)
+
+    @catch_and_log_error
     def do_show(self, line):
         """
         show
@@ -223,19 +265,16 @@ class WindShell(cmd.Cmd):
         """
         print(s)
 
+    @catch_and_log_error
     def do_x(self, line):
         """x(crosswind) wind_direction velocity
         calculate crosswind component in reference to runway angle"""
         args = self._cast_float(line)
-        try:
-            result = self.wind_calc.calculate_crosswind(*args)
-        except Exception as e:
-            print(e)
-            print(f'args -> {args}')
-        else:
-            prefix = 'L' if result < 0 else 'R'
-            print(f'{prefix} {abs(result):.1f}kts')
+        result = self.wind_calc.calculate_crosswind(*args)
+        prefix = 'L' if result < 0 else 'R'
+        print(f'{prefix} {abs(result):.1f}kts')
 
+    @catch_and_log_error
     def do_h(self, line):
         """
         h(eadwind) wind_direction velocity
@@ -247,15 +286,11 @@ class WindShell(cmd.Cmd):
             `h 70 20` -> "HEADWIND 6.8 kts"
         """
         args = self._cast_float(line)
-        try:
-            result = self.wind_calc.calculate_headwind(*args)
-        except Exception as e:
-            print(e)
-            print(f'args -> {args}')
-        else:
-            flag = 'TAILWIND' if result < 0 else 'HEADWIND'
-            print(f'{flag} {abs(result):.1f} kts')
+        result = self.wind_calc.calculate_headwind(*args)
+        flag = 'TAILWIND' if result < 0 else 'HEADWIND'
+        print(f'{flag} {abs(result):.1f} kts')
 
+    @catch_and_log_error
     def do_maxt(self, line):
         """
         maxt(ailwind) wind_dir [l]
@@ -263,32 +298,26 @@ class WindShell(cmd.Cmd):
         Calculate the maximum wind velocity acceptable without exceeding tailwind limit. If `l` is passed,
         used the landing tailwind limitation.
         """
-        try:
-            args = line.split()
-            landing_calc = True if args[-1] == 'l' else False
-            wind_dir = float(args[0])
-            calc_type = f'Landing Calculation (limit: {self.wind_calc.max_ldg_tailwind:1.1f} kts)' if landing_calc \
-                else f'Takeoff Calculation (limit: {self.wind_calc.max_to_tailwind:1.1f} kts)'
-        except IndexError as e:
-            self.onecmd('?maxt')
-            return
+        args = line.split()
+        landing_calc = True if args[-1] == 'l' else False
+        wind_dir = float(args[0])
+        calc_type = f'Landing Calculation (limit: {self.wind_calc.max_ldg_tailwind:1.1f} kts)' if landing_calc \
+            else f'Takeoff Calculation (limit: {self.wind_calc.max_to_tailwind:1.1f} kts)'
         try:
             result = self.wind_calc.calculate_max_tailwind_velocity(wind_dir, landing=landing_calc)
             print(calc_type)
             if result == -1:
                 raise ValueError
-        except ValueError as e:
+        except ValueError:
             print(
                 f'No maximum tailwind from {args[0]}° in reference to runway/angle {self.wind_calc.runway_heading}°'
             )
-        except Exception as e:
-            print(e)
-            print(f'args -> {args}')
         else:
             print(
                 f'Max Tailwind from {args[0]}° for reference angle {self.wind_calc.runway_heading}° -> {result:.1f}'
             )
 
+    @catch_and_log_error
     def do_winds(self, line):
         """
         winds wind_direction velocity
@@ -306,28 +335,24 @@ class WindShell(cmd.Cmd):
             Headwind: 15.3
         """
         args = self._cast_float(line)
-        try:
-            result = self.wind_calc.winds(*args)
-        except Exception as e:
-            print(e)
-            print(f'args -> {args}')
-        else:
-            results = self.wind_calc.winds(*args)
-            s = Template(
-                '\nWind Components for $wind_dir° @ ${velocity}kts from HDG: $hdg\n\n'
-                'Crosswind: $l_or_r $xwind\n'
-                '${h_or_t}wind: $hwind\n')
-            vals = {
-                'wind_dir': args[0],
-                'velocity': args[1],
-                'hdg': self.wind_calc.runway_heading,
-                'xwind': round(abs(results.x_wind), 1),
-                'hwind': round(abs(results.h_wind), 1),
-                'h_or_t': 'Tail' if results.h_wind < 0 else 'Head',
-                'l_or_r': 'L' if results.x_wind < 0 else 'R'
-            }
-            print(s.safe_substitute(vals))
+        result = self.wind_calc.winds(*args)
+        results = self.wind_calc.winds(*args)
+        s = Template(
+            '\nWind Components for $wind_dir° @ ${velocity}kts from HDG: $hdg\n\n'
+            'Crosswind: $l_or_r $xwind\n'
+            '${h_or_t}wind: $hwind\n')
+        vals = {
+            'wind_dir': args[0],
+            'velocity': args[1],
+            'hdg': self.wind_calc.runway_heading,
+            'xwind': round(abs(results.x_wind), 1),
+            'hwind': round(abs(results.h_wind), 1),
+            'h_or_t': 'Tail' if results.h_wind < 0 else 'Head',
+            'l_or_r': 'L' if results.x_wind < 0 else 'R'
+        }
+        print(s.safe_substitute(vals))
 
+    @catch_and_log_error
     def do_grid(self, line):
         """
         grid wind_dir [l(anding calculation]
@@ -354,12 +379,7 @@ class WindShell(cmd.Cmd):
         args = line.split()
         landing_calc = 'l' in args
 
-        try:
-            wind_dir = int(args[0])
-        except Exception as e:
-            print(e)
-            self.onecmd('?grid')
-            return
+        wind_dir = int(args[0])
 
         ldg_or_head = f'Landing ({self.wind_calc.max_ldg_tailwind} kts)' if landing_calc \
             else f'Takeoff ({self.wind_calc.max_to_tailwind} kts)'
@@ -398,6 +418,7 @@ class WindShell(cmd.Cmd):
         print('-' * len(hdr_str))
         print(''.join(val_strs))
 
+    @catch_and_log_error
     def do_exit(self, line):
         """
         Quit using this stupid thing.
