@@ -10,9 +10,9 @@
             "frame" : "{{6, 6}, {150, 40}}",
             "class" : "Label",
             "attributes" : {
-              "font_size" : 18,
               "flex" : "WR",
               "border_width" : 2,
+              "font_size" : 18,
               "frame" : "{{85, 224}, {150, 32}}",
               "uuid" : "AD943E51-4F42-4C9C-9EE0-6DE93F0FAF91",
               "class" : "Label",
@@ -57,7 +57,7 @@
               "value" : 0.10000000000000001,
               "name" : "wind_speed_slider"
             },
-            "selected" : true
+            "selected" : false
           },
           {
             "nodes" : [
@@ -102,9 +102,9 @@
             "frame" : "{{164, 6}, {150, 40}}",
             "class" : "Label",
             "attributes" : {
-              "name" : "runway_dir_label",
               "flex" : "WL",
               "border_width" : 2,
+              "name" : "runway_dir_label",
               "frame" : "{{85, 224}, {150, 32}}",
               "uuid" : "C53521D6-AF87-439E-948C-24C779841D2D",
               "class" : "Label",
@@ -120,23 +120,23 @@
             "nodes" : [
 
             ],
-            "frame" : "{{59, 68}, {120, 29}}",
+            "frame" : "{{6, 54}, {308, 43}}",
             "class" : "SegmentedControl",
             "attributes" : {
-              "uuid" : "AEDF9403-3F33-4AC3-B052-1CF1CB3F3028",
+              "segments" : "RWY|WIND",
               "frame" : "{{100, 226}, {120, 29}}",
+              "uuid" : "AEDF9403-3F33-4AC3-B052-1CF1CB3F3028",
               "name" : "runway_wind_controller",
               "class" : "SegmentedControl",
-              "segments" : "RWY|WIND",
-              "flex" : "LRT"
+              "flex" : "WB"
             },
-            "selected" : false
+            "selected" : true
           }
         ],
         "frame" : "{{0, 0}, {320, 480}}",
         "class" : "View",
         "attributes" : {
-          "flex" : "WH",
+          "flex" : "WHLRTB",
           "border_width" : 2,
           "custom_class" : "WindCalcView",
           "frame" : "{{110, 190}, {100, 100}}",
