@@ -1,7 +1,17 @@
 import ui
 import winds
 from string import Template
+from pathlib import Path
+import markdown2 as md2
 
+INITIAL_RESULT = (
+    '''
+#Welcome to the Wind Calculator!
+
+    
+    
+    '''
+    )
 
 
 def wind_dir_slider_moved(slider):
@@ -9,7 +19,15 @@ def wind_dir_slider_moved(slider):
     val *= 10
     wind_dir_label.text = WIND_DIR_TEMPLATE.substitute(wind_dir=f'{val:3.0f}')
     
+def populate_template(markdown_text):
+    template_path = Path('result_template.html')
+    template_string = template_path.read_text()
+    new = template_string.replace('{{ markdown }}', md2.markdown(markdown_text))
+    return new
+    
 class WindCalcView(ui.View):
+    
+    
     
     WIND_INFO_LABEL_TEMPLATE = Template('Winds: ${wind_dir}° @ ${wind_speed} kts')
     RUNWAY_DIR_LABEL_TEMPLATE = Template('Runway HDG: ${runway_dir}°')
@@ -34,7 +52,9 @@ class WindCalcView(ui.View):
         
         self.runway_wind_controller = self['runway_wind_controller']
         self.runway_wind_controller.action = self.snap_slider_to_prev_val
-
+        
+        self.webview = self['webview']
+        self.webview.load_html(populate_template(INITIAL_RESULT))
         
         self.update_wind_info_label()
         self.update_runway_dir_label()

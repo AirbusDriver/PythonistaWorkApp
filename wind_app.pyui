@@ -123,12 +123,28 @@
             "frame" : "{{6, 54}, {308, 43}}",
             "class" : "SegmentedControl",
             "attributes" : {
-              "segments" : "RWY|WIND",
+              "name" : "runway_wind_controller",
               "frame" : "{{100, 226}, {120, 29}}",
               "uuid" : "AEDF9403-3F33-4AC3-B052-1CF1CB3F3028",
-              "name" : "runway_wind_controller",
               "class" : "SegmentedControl",
+              "segments" : "RWY|WIND",
               "flex" : "WB"
+            },
+            "selected" : false
+          },
+          {
+            "nodes" : [
+
+            ],
+            "frame" : "{{0, 189}, {320, 291}}",
+            "class" : "WebView",
+            "attributes" : {
+              "scales_to_fit" : true,
+              "frame" : "{{60, 140}, {200, 200}}",
+              "flex" : "WH",
+              "class" : "WebView",
+              "name" : "webview",
+              "uuid" : "D6356CF6-1E95-42B1-935C-3717D0004789"
             },
             "selected" : true
           }
