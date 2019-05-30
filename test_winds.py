@@ -1,5 +1,5 @@
-from mock import Mock
-import mock
+from unittest.mock import Mock
+from unittest import mock
 
 import pytest
 
