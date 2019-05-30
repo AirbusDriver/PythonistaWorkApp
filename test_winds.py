@@ -3,7 +3,7 @@ from unittest import mock
 
 import pytest
 
-from winds import (get_headwind, get_crosswind, get_winds, Wind, get_max_crosswind_velocity,
+from winds import (get_headwind, get_crosswind, get_winds, Wind, get_max_crosswind_velocity, Direction,
                    get_max_tailwind_velocity, max_wind_grid, WindCalculator, WindShell, catch_and_log_error)
 
 
@@ -208,6 +208,31 @@ class TestWindCalculator:
             assert getattr(wind_calc, attr) == new_val
             wind_calc.reset_all()
             assert val == getattr(wind_calc, attr)
+            
+            
+        
+class TestDirection:
+    def test_can_init(self):
+        direction = Direction()
+     
+    @pytest.mark.parametrize('val, exp', [
+        (0, 0),
+        (90, 90),
+        (540, 180),
+        (-540, 180)
+        ])   
+    def test_normalize(self, val, exp):
+        assert Direction.normalize(val) == exp
+        
+    def test_can_add(self):
+        assert 0
+        
+    def test_can_subtract(self):
+        assert 0
+            
+            
+class TestWindVector:
+    pass
 
 
 @pytest.mark.usefixtures('mock_wind_calc_shell')

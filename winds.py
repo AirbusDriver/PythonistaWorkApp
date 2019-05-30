@@ -19,6 +19,23 @@ MAX_TO_TAILWIND = 15
 MAX_LAND_TAILWIND = 10
 
 
+class Direction:
+    def __init__(self, initial=0):
+        self._value = initial
+       
+    @staticmethod
+    def normalize(value):
+        return value % 360
+        
+    @property
+    def value(self):
+        pass
+
+
+class WindVector:
+    pass
+
+
 def get_winds(wind, velocity, runway=360):
     """Return Wind(h_wind, x_wind) tuple."""
     runway %= 360
