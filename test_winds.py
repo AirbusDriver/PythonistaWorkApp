@@ -213,7 +213,7 @@ class TestWindCalculator:
         
 class TestDirection:
     def test_can_init(self):
-        direction = Direction()
+        direction = Direction(0)
      
     @pytest.mark.parametrize('val, exp', [
         (0, 0),
@@ -223,12 +223,25 @@ class TestDirection:
         ])   
     def test_normalize(self, val, exp):
         assert Direction.normalize(val) == exp
+     
+    @pytest.mark.parametrize('val, exp', [
+        (360.1, 0.1),
+        (90.45, 90.5),
+        ])
+    def test_value_rounding(self, val, exp):
+        assert Direction(val).value == exp
         
     def test_can_add(self):
-        assert 0
+        d3 = Direction(90) + Direction(90)
+        assert d3.value == 180          
         
     def test_can_subtract(self):
-        assert 0
+        d4 = Direction(0) - Direction(90)
+        assert d4.value == 270
+        
+        d4 -= 180
+        
+        assert d4.value == 90
             
             
 class TestWindVector:

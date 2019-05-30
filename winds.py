@@ -20,8 +20,12 @@ MAX_LAND_TAILWIND = 10
 
 
 class Direction:
-    def __init__(self, initial=0):
+    PRECISION = 1
+    def __init__(self, initial):
         self._value = initial
+        
+    def __repr__(self):
+        return f'Direction({self.value})'
        
     @staticmethod
     def normalize(value):
@@ -29,7 +33,24 @@ class Direction:
         
     @property
     def value(self):
-        pass
+        return round(self.normalize(self._value), self.PRECISION)
+        
+    @value.setter
+    def value(self, val):
+        if not isinstance(val, (float, int)):
+            raise TypeError('val must be int or float')
+        self._value = val
+        
+    def __add__(self, other):
+        if isinstance(other, Direction):
+            other = other._value
+        return Direction(self._value + other)
+        
+    def __sub__(self, other):
+        if isinstance(other, Direction):
+            other = other._value
+        return self + Direction(-1 * other)
+        
 
 
 class WindVector:
