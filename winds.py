@@ -11,6 +11,9 @@ import argparse
 
 Wind = namedtuple('Wind', ['h_wind', 'x_wind'])
 
+# TODO: Add RCAM value mapping
+# TODO: Add max x_wind value to grid function header
+
 MAX_XWIND = 38
 MAX_TO_TAILWIND = 15
 MAX_LAND_TAILWIND = 10
@@ -276,12 +279,11 @@ class WindShell(cmd.Cmd):
         display the runway heading, max xwind, max takeoff tailwind, max landing tailwind
         """
 
-        s = f"""
-        RWY HDG [set r]:        {self.wind_calc.runway_heading}º
-        MAX XWIND [set x]:      {self.wind_calc.max_crosswind} kts
-        MAX TO TAIL [set to]:   {self.wind_calc.max_to_tailwind} kts 
-        MAX LDG TAIL [set ldg]: {self.wind_calc.max_ldg_tailwind} kts
-        """
+        s = ("""
+        RWY HDG [set r]:        {0.runway_heading}º
+        MAX XWIND [set x]:      {0.max_crosswind} kts
+        MAX TO TAIL [set to]:   {0.max_to_tailwind} kts 
+        MAX LDG TAIL [set ldg]: {0.max_ldg_tailwind} kts""".format(self.wind_calc))
         print(s)
 
     @catch_and_log_error
