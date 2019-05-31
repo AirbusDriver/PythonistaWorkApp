@@ -41,6 +41,22 @@ class Direction:
             raise TypeError('val must be int or float')
         self._value = val
         
+    def theta(self, other):
+        """
+        Return the number of degrees clockwise from object's `value` attribute to 
+        `other`
+        
+        Example:
+            
+            >>> Direction(90).theta(91)
+            Direction(1.0)
+            >>> Direction(90).theta(89)
+            Direction(359.0)
+        """
+        if isinstance(other, Direction):
+            other = other._value
+        return Direction(float((other - self._value) % 360))
+         
     def __add__(self, other):
         if isinstance(other, Direction):
             other = other._value
@@ -51,11 +67,35 @@ class Direction:
             other = other._value
         return self + Direction(-1 * other)
         
+    def __eq__(self, other):
+        """
+        Return True if other == self within the precision of `Direction`
+        
+        Example:
+            
+            >>> Direction.PRECISION = 1
+            >>> Direction(90.04) == 90
+            True
+            
+        """
+        if not isinstance(other, Direction):
+            other = Direction(other)
+        return other.value == self.value
+        
 
 
 class WindVector:
-    pass
-
+    def __init__(self, direction, strength, strength_unit='kts'):
+        self.direction = Direction(direction)
+        self.strength = strength
+        self.strength_unit = strength_unit
+        
+    def __repr__(self):
+        return f'Wind: {self.direction.value}° @ {self.strength:.1f}{self.strength_unit}'
+        
+    def to_tuple(self):
+        return (self.direction.value, self.strength)
+        
 
 def get_winds(wind, velocity, runway=360):
     """Return Wind(h_wind, x_wind) tuple."""

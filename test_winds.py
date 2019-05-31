@@ -242,6 +242,28 @@ class TestDirection:
         d4 -= 180
         
         assert d4.value == 90
+        
+    @pytest.mark.parametrize('d, d2, exp', [
+        (90, 91, 1.0),
+        (90, 89, 359.0),
+        (0, 10, 10.0),
+        (0, 350, 350.0)
+        ])
+    def test_theta(self, d, d2, exp):
+        assert Direction(d).theta(d2).value == exp
+        
+    def test_equality(self):
+        d = Direction(90.1)
+        
+        assert d == Direction(90.1)
+        assert d == 90.1
+        assert d != 90.0
+        assert d == 90.06
+        assert d == 90.14
+        
+        
+        
+        
             
             
 class TestWindVector:
