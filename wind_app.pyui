@@ -127,7 +127,7 @@
               "frame" : "{{100, 226}, {120, 29}}",
               "uuid" : "AEDF9403-3F33-4AC3-B052-1CF1CB3F3028",
               "class" : "SegmentedControl",
-              "segments" : "RWY|WIND",
+              "segments" : "WIND|RWY",
               "flex" : "WB"
             },
             "selected" : false
@@ -136,17 +136,56 @@
             "nodes" : [
 
             ],
-            "frame" : "{{0, 189}, {320, 291}}",
-            "class" : "WebView",
+            "frame" : "{{6, 189}, {308, 29}}",
+            "class" : "SegmentedControl",
             "attributes" : {
-              "scales_to_fit" : true,
-              "frame" : "{{60, 140}, {200, 200}}",
-              "flex" : "WH",
-              "class" : "WebView",
-              "name" : "webview",
-              "uuid" : "D6356CF6-1E95-42B1-935C-3717D0004789"
+              "class" : "SegmentedControl",
+              "frame" : "{{100, 226}, {120, 29}}",
+              "uuid" : "29BD01EF-CD22-4259-8638-101ADEDCA5DB",
+              "segments" : "GRID|OTHER",
+              "name" : "calculation_type_controller",
+              "flex" : "W"
             },
-            "selected" : true
+            "selected" : false
+          },
+          {
+            "nodes" : [
+
+            ],
+            "frame" : "{{6, 226}, {308, 32}}",
+            "class" : "Button",
+            "attributes" : {
+              "flex" : "W",
+              "border_width" : 1,
+              "frame" : "{{120, 224}, {80, 32}}",
+              "title" : "CALCULATE",
+              "uuid" : "336F6620-0DF7-470D-BEB7-FB39ED029D3F",
+              "font_bold" : true,
+              "class" : "Button",
+              "corner_radius" : 2,
+              "border_color" : "RGBA(0.910377,0.910377,0.910377,1.000000)",
+              "name" : "calculate_button",
+              "font_size" : 15
+            },
+            "selected" : false
+          },
+          {
+            "nodes" : [
+
+            ],
+            "frame" : "{{6, 266}, {308, 208}}",
+            "class" : "NavigationView",
+            "attributes" : {
+              "flex" : "WH",
+              "title_bar_color" : "RGBA(1.0, 1.0, 1.0, 1.0)",
+              "frame" : "{{0, 80}, {320, 320}}",
+              "title_color" : "RGBA(0.33, 0.33, 0.33, 1.0)",
+              "uuid" : "21BCB837-DE9C-4C18-BD65-B053F47A5C52",
+              "class" : "NavigationView",
+              "root_view_name" : "RESULTS",
+              "name" : "results_nav_view"
+            },
+            "selected" : false
           }
         ],
         "frame" : "{{0, 0}, {320, 480}}",
