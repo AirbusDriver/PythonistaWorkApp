@@ -1,9 +1,9 @@
-from mock import Mock
-import mock
+from unittest.mock import Mock
+from unittest import mock
 
 import pytest
 
-from winds import (get_headwind, get_crosswind, get_winds, Wind, get_max_crosswind_velocity,
+from winds import (get_headwind, get_crosswind, get_winds, Wind, get_max_crosswind_velocity, Direction,
                    get_max_tailwind_velocity, max_wind_grid, WindCalculator, WindShell, catch_and_log_error)
 
 
@@ -208,6 +208,66 @@ class TestWindCalculator:
             assert getattr(wind_calc, attr) == new_val
             wind_calc.reset_all()
             assert val == getattr(wind_calc, attr)
+            
+            
+        
+class TestDirection:
+    def test_can_init(self):
+        direction = Direction(0)
+     
+    @pytest.mark.parametrize('val, exp', [
+        (0, 0),
+        (90, 90),
+        (540, 180),
+        (-540, 180)
+        ])   
+    def test_normalize(self, val, exp):
+        assert Direction.normalize(val) == exp
+     
+    @pytest.mark.parametrize('val, exp', [
+        (360.1, 0.1),
+        (90.45, 90.5),
+        ])
+    def test_value_rounding(self, val, exp):
+        assert Direction(val).value == exp
+        
+    def test_can_add(self):
+        d3 = Direction(90) + Direction(90)
+        assert d3.value == 180          
+        
+    def test_can_subtract(self):
+        d4 = Direction(0) - Direction(90)
+        assert d4.value == 270
+        
+        d4 -= 180
+        
+        assert d4.value == 90
+        
+    @pytest.mark.parametrize('d, d2, exp', [
+        (90, 91, 1.0),
+        (90, 89, 359.0),
+        (0, 10, 10.0),
+        (0, 350, 350.0)
+        ])
+    def test_theta(self, d, d2, exp):
+        assert Direction(d).theta(d2).value == exp
+        
+    def test_equality(self):
+        d = Direction(90.1)
+        
+        assert d == Direction(90.1)
+        assert d == 90.1
+        assert d != 90.0
+        assert d == 90.06
+        assert d == 90.14
+        
+        
+        
+        
+            
+            
+class TestWindVector:
+    pass
 
 
 @pytest.mark.usefixtures('mock_wind_calc_shell')
