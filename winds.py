@@ -11,10 +11,91 @@ import argparse
 
 Wind = namedtuple('Wind', ['h_wind', 'x_wind'])
 
+# TODO: Add RCAM value mapping
+# TODO: Add max x_wind value to grid function header
+
 MAX_XWIND = 38
 MAX_TO_TAILWIND = 15
 MAX_LAND_TAILWIND = 10
 
+
+class Direction:
+    PRECISION = 1
+    def __init__(self, initial):
+        self._value = initial
+        
+    def __repr__(self):
+        return f'Direction({self.value})'
+       
+    @staticmethod
+    def normalize(value):
+        return value % 360
+        
+    @property
+    def value(self):
+        return round(self.normalize(self._value), self.PRECISION)
+        
+    @value.setter
+    def value(self, val):
+        if not isinstance(val, (float, int)):
+            raise TypeError('val must be int or float')
+        self._value = val
+        
+    def theta(self, other):
+        """
+        Return the number of degrees clockwise from object's `value` attribute to 
+        `other`
+        
+        Example:
+            
+            >>> Direction(90).theta(91)
+            Direction(1.0)
+            >>> Direction(90).theta(89)
+            Direction(359.0)
+        """
+        if isinstance(other, Direction):
+            other = other._value
+        return Direction(float((other - self._value) % 360))
+         
+    def __add__(self, other):
+        if isinstance(other, Direction):
+            other = other._value
+        return Direction(self._value + other)
+        
+    def __sub__(self, other):
+        if isinstance(other, Direction):
+            other = other._value
+        return self + Direction(-1 * other)
+        
+    def __eq__(self, other):
+        """
+        Return True if other == self within the precision of `Direction`
+        
+        Example:
+            
+            >>> Direction.PRECISION = 1
+            >>> Direction(90.04) == 90
+            True
+            
+        """
+        if not isinstance(other, Direction):
+            other = Direction(other)
+        return other.value == self.value
+        
+
+
+class WindVector:
+    def __init__(self, direction, strength, strength_unit='kts'):
+        self.direction = Direction(direction)
+        self.strength = strength
+        self.strength_unit = strength_unit
+        
+    def __repr__(self):
+        return f'Wind: {self.direction.value}° @ {self.strength:.1f}{self.strength_unit}'
+        
+    def to_tuple(self):
+        return (self.direction.value, self.strength)
+        
 
 def get_winds(wind, velocity, runway=360):
     """Return Wind(h_wind, x_wind) tuple."""
@@ -276,12 +357,11 @@ class WindShell(cmd.Cmd):
         display the runway heading, max xwind, max takeoff tailwind, max landing tailwind
         """
 
-        s = f"""
-        RWY HDG [set r]:        {self.wind_calc.runway_heading}º
-        MAX XWIND [set x]:      {self.wind_calc.max_crosswind} kts
-        MAX TO TAIL [set to]:   {self.wind_calc.max_to_tailwind} kts 
-        MAX LDG TAIL [set ldg]: {self.wind_calc.max_ldg_tailwind} kts
-        """
+        s = ("""
+        RWY HDG [set r]:        {0.runway_heading}º
+        MAX XWIND [set x]:      {0.max_crosswind} kts
+        MAX TO TAIL [set to]:   {0.max_to_tailwind} kts 
+        MAX LDG TAIL [set ldg]: {0.max_ldg_tailwind} kts""".format(self.wind_calc))
         print(s)
 
     @catch_and_log_error

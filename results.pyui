@@ -1,0 +1,40 @@
+[
+  {
+    "nodes" : [
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{34, 45}, {200, 200}}",
+        "class" : "TableView",
+        "attributes" : {
+          "uuid" : "9300354A-22CD-4734-9999-CB23AC746D1E",
+          "corner_radius" : 2,
+          "background_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "frame" : "{{412, 284}, {200, 200}}",
+          "data_source_items" : "Row 1\nRow 2\nRow 3",
+          "border_color" : "RGBA(0.096698,0.096698,0.096698,1.000000)",
+          "data_source_number_of_lines" : 1,
+          "border_width" : 2,
+          "data_source_delete_enabled" : false,
+          "data_source_font_size" : 18,
+          "row_height" : 44,
+          "class" : "TableView",
+          "name" : "grid_table",
+          "flex" : "WH"
+        },
+        "selected" : true
+      }
+    ],
+    "frame" : "{{0, 0}, {1024, 768}}",
+    "class" : "View",
+    "attributes" : {
+      "enabled" : true,
+      "background_color" : "RGBA(1.000000,1.000000,1.000000,1.000000)",
+      "tint_color" : "RGBA(0.000000,0.478000,1.000000,1.000000)",
+      "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+      "flex" : ""
+    },
+    "selected" : false
+  }
+]

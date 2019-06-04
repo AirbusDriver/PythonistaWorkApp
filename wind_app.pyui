@@ -1,0 +1,219 @@
+[
+  {
+    "nodes" : [
+      {
+        "nodes" : [
+          {
+            "nodes" : [
+
+            ],
+            "frame" : "{{6, 6}, {150, 40}}",
+            "class" : "Label",
+            "attributes" : {
+              "flex" : "WR",
+              "border_width" : 2,
+              "font_size" : 18,
+              "frame" : "{{85, 224}, {150, 32}}",
+              "uuid" : "AD943E51-4F42-4C9C-9EE0-6DE93F0FAF91",
+              "class" : "Label",
+              "alignment" : "center",
+              "text" : "",
+              "corner_radius" : 0,
+              "name" : "wind_info_label",
+              "font_name" : "<System>"
+            },
+            "selected" : false
+          },
+          {
+            "nodes" : [
+
+            ],
+            "frame" : "{{59, 105}, {255, 34}}",
+            "class" : "Slider",
+            "attributes" : {
+              "action" : "",
+              "flex" : "WB",
+              "continuous" : false,
+              "frame" : "{{60, 223}, {200, 34}}",
+              "uuid" : "298B284B-AB2B-408A-98E7-68908881E3F1",
+              "class" : "Slider",
+              "value" : 0.5,
+              "name" : "wind_dir_slider"
+            },
+            "selected" : false
+          },
+          {
+            "nodes" : [
+
+            ],
+            "frame" : "{{59, 147}, {255, 34}}",
+            "class" : "Slider",
+            "attributes" : {
+              "action" : "",
+              "flex" : "WB",
+              "frame" : "{{60, 223}, {200, 34}}",
+              "uuid" : "761905DD-2864-4C67-BE0E-712ED9C44605",
+              "class" : "Slider",
+              "value" : 0.10000000000000001,
+              "name" : "wind_speed_slider"
+            },
+            "selected" : false
+          },
+          {
+            "nodes" : [
+
+            ],
+            "frame" : "{{6, 105}, {45, 34}}",
+            "class" : "Label",
+            "attributes" : {
+              "name" : "wind_dir_label",
+              "frame" : "{{85, 224}, {150, 32}}",
+              "uuid" : "6879BB57-8AC0-4443-9524-D3CC1D69FE5A",
+              "class" : "Label",
+              "alignment" : "left",
+              "text" : "DIR°",
+              "font_size" : 18,
+              "font_name" : "<System>"
+            },
+            "selected" : false
+          },
+          {
+            "nodes" : [
+
+            ],
+            "frame" : "{{6, 147}, {45, 34}}",
+            "class" : "Label",
+            "attributes" : {
+              "name" : "wind_speed_label",
+              "frame" : "{{85, 224}, {150, 32}}",
+              "uuid" : "B918AC58-FD38-4079-B289-E8FF469D23E8",
+              "class" : "Label",
+              "alignment" : "left",
+              "text" : "KTS",
+              "font_size" : 18,
+              "font_name" : "<System>"
+            },
+            "selected" : false
+          },
+          {
+            "nodes" : [
+
+            ],
+            "frame" : "{{164, 6}, {150, 40}}",
+            "class" : "Label",
+            "attributes" : {
+              "flex" : "WL",
+              "border_width" : 2,
+              "name" : "runway_dir_label",
+              "frame" : "{{85, 224}, {150, 32}}",
+              "uuid" : "C53521D6-AF87-439E-948C-24C779841D2D",
+              "class" : "Label",
+              "alignment" : "center",
+              "text" : "",
+              "corner_radius" : 0,
+              "font_size" : 18,
+              "font_name" : "<System>"
+            },
+            "selected" : false
+          },
+          {
+            "nodes" : [
+
+            ],
+            "frame" : "{{6, 54}, {308, 43}}",
+            "class" : "SegmentedControl",
+            "attributes" : {
+              "name" : "runway_wind_controller",
+              "frame" : "{{100, 226}, {120, 29}}",
+              "uuid" : "AEDF9403-3F33-4AC3-B052-1CF1CB3F3028",
+              "class" : "SegmentedControl",
+              "segments" : "WIND|RWY",
+              "flex" : "WB"
+            },
+            "selected" : false
+          },
+          {
+            "nodes" : [
+
+            ],
+            "frame" : "{{6, 189}, {308, 29}}",
+            "class" : "SegmentedControl",
+            "attributes" : {
+              "class" : "SegmentedControl",
+              "frame" : "{{100, 226}, {120, 29}}",
+              "uuid" : "29BD01EF-CD22-4259-8638-101ADEDCA5DB",
+              "segments" : "GRID|OTHER",
+              "name" : "calculation_type_controller",
+              "flex" : "W"
+            },
+            "selected" : false
+          },
+          {
+            "nodes" : [
+
+            ],
+            "frame" : "{{6, 226}, {308, 32}}",
+            "class" : "Button",
+            "attributes" : {
+              "flex" : "W",
+              "border_width" : 1,
+              "frame" : "{{120, 224}, {80, 32}}",
+              "title" : "CALCULATE",
+              "uuid" : "336F6620-0DF7-470D-BEB7-FB39ED029D3F",
+              "font_bold" : true,
+              "class" : "Button",
+              "corner_radius" : 2,
+              "border_color" : "RGBA(0.910377,0.910377,0.910377,1.000000)",
+              "name" : "calculate_button",
+              "font_size" : 15
+            },
+            "selected" : false
+          },
+          {
+            "nodes" : [
+
+            ],
+            "frame" : "{{6, 266}, {308, 208}}",
+            "class" : "NavigationView",
+            "attributes" : {
+              "flex" : "WH",
+              "title_bar_color" : "RGBA(1.0, 1.0, 1.0, 1.0)",
+              "frame" : "{{0, 80}, {320, 320}}",
+              "title_color" : "RGBA(0.33, 0.33, 0.33, 1.0)",
+              "uuid" : "21BCB837-DE9C-4C18-BD65-B053F47A5C52",
+              "class" : "NavigationView",
+              "root_view_name" : "RESULTS",
+              "name" : "results_nav_view"
+            },
+            "selected" : false
+          }
+        ],
+        "frame" : "{{0, 0}, {320, 480}}",
+        "class" : "View",
+        "attributes" : {
+          "flex" : "WHLRTB",
+          "border_width" : 2,
+          "custom_class" : "WindCalcView",
+          "frame" : "{{110, 190}, {100, 100}}",
+          "class" : "View",
+          "background_color" : "RGBA(0.833071,0.882075,0.882075,1.000000)",
+          "uuid" : "406E7ACC-66F0-4BF3-9751-491E5046DCEE",
+          "corner_radius" : 0,
+          "border_color" : "RGBA(0.297170,0.297170,0.297170,1.000000)",
+          "name" : "wind_calc_view"
+        },
+        "selected" : true
+      }
+    ],
+    "frame" : "{{0, 0}, {320, 480}}",
+    "class" : "View",
+    "attributes" : {
+      "enabled" : true,
+      "background_color" : "RGBA(1.000000,1.000000,1.000000,1.000000)",
+      "tint_color" : "RGBA(0.000000,0.478000,1.000000,1.000000)",
+      "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+      "flex" : ""
+    },
+    "selected" : false
+  }
+]
