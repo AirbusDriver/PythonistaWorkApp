@@ -96,6 +96,9 @@ class WindCalcView(ui.View):
         func()
         
     def do_grid_calculation(self):
+        """
+        Create and push the results view
+        """
         grid = winds.max_wind_grid(
             self.wind_dir,
             7,
