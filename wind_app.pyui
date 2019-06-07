@@ -12,14 +12,14 @@
             "attributes" : {
               "flex" : "WR",
               "border_width" : 2,
-              "font_size" : 18,
+              "name" : "wind_info_label",
               "frame" : "{{85, 224}, {150, 32}}",
               "uuid" : "AD943E51-4F42-4C9C-9EE0-6DE93F0FAF91",
               "class" : "Label",
               "alignment" : "center",
               "text" : "",
               "corner_radius" : 0,
-              "name" : "wind_info_label",
+              "font_size" : 18,
               "font_name" : "<System>"
             },
             "selected" : false
@@ -66,13 +66,13 @@
             "frame" : "{{6, 105}, {45, 34}}",
             "class" : "Label",
             "attributes" : {
-              "name" : "wind_dir_label",
+              "font_size" : 18,
               "frame" : "{{85, 224}, {150, 32}}",
               "uuid" : "6879BB57-8AC0-4443-9524-D3CC1D69FE5A",
               "class" : "Label",
               "alignment" : "left",
               "text" : "DIR°",
-              "font_size" : 18,
+              "name" : "wind_dir_label",
               "font_name" : "<System>"
             },
             "selected" : false
@@ -84,13 +84,13 @@
             "frame" : "{{6, 147}, {45, 34}}",
             "class" : "Label",
             "attributes" : {
-              "name" : "wind_speed_label",
+              "font_size" : 18,
               "frame" : "{{85, 224}, {150, 32}}",
               "uuid" : "B918AC58-FD38-4079-B289-E8FF469D23E8",
               "class" : "Label",
               "alignment" : "left",
               "text" : "KTS",
-              "font_size" : 18,
+              "name" : "wind_speed_label",
               "font_name" : "<System>"
             },
             "selected" : false
@@ -104,14 +104,14 @@
             "attributes" : {
               "flex" : "WL",
               "border_width" : 2,
-              "name" : "runway_dir_label",
+              "font_size" : 18,
               "frame" : "{{85, 224}, {150, 32}}",
               "uuid" : "C53521D6-AF87-439E-948C-24C779841D2D",
               "class" : "Label",
               "alignment" : "center",
               "text" : "",
               "corner_radius" : 0,
-              "font_size" : 18,
+              "name" : "runway_dir_label",
               "font_name" : "<System>"
             },
             "selected" : false
@@ -123,11 +123,11 @@
             "frame" : "{{6, 54}, {308, 43}}",
             "class" : "SegmentedControl",
             "attributes" : {
-              "name" : "runway_wind_controller",
+              "class" : "SegmentedControl",
               "frame" : "{{100, 226}, {120, 29}}",
               "uuid" : "AEDF9403-3F33-4AC3-B052-1CF1CB3F3028",
-              "class" : "SegmentedControl",
               "segments" : "WIND|RWY",
+              "name" : "runway_wind_controller",
               "flex" : "WB"
             },
             "selected" : false
@@ -139,11 +139,11 @@
             "frame" : "{{6, 189}, {308, 29}}",
             "class" : "SegmentedControl",
             "attributes" : {
-              "class" : "SegmentedControl",
+              "segments" : "GRID TO|GRID LDG|OTHER",
               "frame" : "{{100, 226}, {120, 29}}",
               "uuid" : "29BD01EF-CD22-4259-8638-101ADEDCA5DB",
-              "segments" : "GRID|OTHER",
               "name" : "calculation_type_controller",
+              "class" : "SegmentedControl",
               "flex" : "W"
             },
             "selected" : false
