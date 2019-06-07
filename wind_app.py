@@ -1,3 +1,5 @@
+__version__ = '0.6.1'
+
 import ui
 from string import Template
 from pathlib import Path

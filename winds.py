@@ -1,5 +1,7 @@
 #! /usr/local/bin/python3.6
 
+__version__ = '1.0.0'
+
 from math import radians
 import math
 from collections import namedtuple, OrderedDict
