@@ -218,6 +218,7 @@ def catch_and_log_error(func):
     return _wrapper
 
 
+# TODO: make headings Direction instances with property access methods
 class WindCalculator:
 
     def __init__(self):

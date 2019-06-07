@@ -39,7 +39,8 @@ class GridResultsTableSource(ui.ListDataSource):
                 return NO_MAX_WIND_TEMPLATE.format(direction=direction)
         except Exception as e:
             return str(e)
-
+            
+# TODO: name view with the winds and phase
 def make_grid_view(results):
     """
     Return a TableView populate with the results of a grid 
