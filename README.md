@@ -10,6 +10,9 @@ Current Apps
 * winds.py: Command Line Interface for calculating wind components, and max winds from a 
 range of directions. 
 
+* wind_app.py: GUI for calculating the maximum wind velocity allowable while still being within 
+the max crosswind & tailwind limitations.
+
 Installation
 ------------
 
