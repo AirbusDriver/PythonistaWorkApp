@@ -3,8 +3,15 @@ Module containing the WindShell command loop
 """
 import cmd
 from functools import wraps
+import logging
+
+logger = logging.getLogger(__name__)
+
+print(logger)
+
 
 from .calculator import WindCalculator
+from . import max_wind_grid
 
 
 def catch_and_log_error(func):
@@ -14,7 +21,7 @@ def catch_and_log_error(func):
             result = func(*args, **kwargs)
         except Exception as e:
             logger.debug(f"Error in `{func.__name__}(args: {args}, kwargs: {kwargs})`")
-            logger.debug(f'Exc info: {str(e)}')
+            logger.error(f'Exc info: {str(e)}')
             print(f'Error Occurred!!')
             try:
                 stripped_cmd = func.__name__.replace('do_', '')
