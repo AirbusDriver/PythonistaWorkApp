@@ -7,11 +7,8 @@ installed on their company iPads.
 Current Apps
 ------------
 
-* winds.py: Command Line Interface for calculating wind components, and max winds from a 
+* \__main__.py: Shell Interface for calculating wind components, and max winds from a 
 range of directions. 
-
-* wind_app.py: GUI for calculating the maximum wind velocity allowable while still being within 
-the max crosswind & tailwind limitations.
 
 Installation
 ------------
@@ -23,4 +20,12 @@ of this repo.
 Road Map
 --------
 
+* unified gui for all plugins
 * briefer.py: line select airports in company OPSPECS that you travel to frequently. Then grab quick METAR/TAF data
+
+Winds Shell
+---------
+
+Currently, the wind calculation shell is the only thing implemented. The main entry point for the shell is in
+the \__main__.py file. This can be invoked by either running the \__main__.py file directly or by running
+python3 -m work... but, since you are presumably running this in pythonista, just run the file directly.

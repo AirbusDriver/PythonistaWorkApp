@@ -4,7 +4,11 @@ from unittest import mock
 import pytest
 
 from winds import (get_headwind, get_crosswind, get_winds, Wind, get_max_crosswind_velocity, Direction,
-                   get_max_tailwind_velocity, max_wind_grid, WindCalculator, WindShell, catch_and_log_error)
+                   get_max_tailwind_velocity, max_wind_grid
+                   )
+from winds.calculator import WindCalculator
+from winds.shell import WindShell, catch_and_log_error
+   
 
 
 @pytest.fixture('class')
