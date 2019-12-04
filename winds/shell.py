@@ -4,6 +4,7 @@ Module containing the WindShell command loop
 import cmd
 from functools import wraps
 import logging
+from string import Template
 
 logger = logging.getLogger(__name__)
 

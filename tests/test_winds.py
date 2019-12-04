@@ -274,7 +274,6 @@ class TestWindVector:
     pass
 
 
-@pytest.mark.usefixtures('mock_wind_calc_shell')
 class TestWindShell:
 
     @pytest.mark.parametrize('headwind_return, expected_flag', [
@@ -300,4 +299,15 @@ class TestWindShell:
         shell.wind_calc.reset_all.return_value = None
         shell.onecmd('reset')
         shell.wind_calc.reset_all.assert_called_with()
-
+        
+    def test_do_winds(self, capsys):
+        shell = WindShell()
+        
+        res = shell.do_winds('330 15')
+        
+        out, err = capsys.readouterr()
+        
+        assert out
+        assert not err
+        
+    
