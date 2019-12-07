@@ -8,8 +8,6 @@ from string import Template
 
 logger = logging.getLogger(__name__)
 
-print(logger)
-
 
 from .calculator import WindCalculator
 from . import max_wind_grid
@@ -22,7 +20,7 @@ def catch_and_log_error(func):
             result = func(*args, **kwargs)
         except Exception as e:
             logger.debug(f"Error in `{func.__name__}(args: {args}, kwargs: {kwargs})`")
-            logger.error(f'Exc info: {str(e)}')
+            logger.exception(f'Exc info: {str(e)}')
             print(f'Error Occurred!!')
             try:
                 stripped_cmd = func.__name__.replace('do_', '')
@@ -36,7 +34,17 @@ def catch_and_log_error(func):
     return _wrapper
 
 
+# todo: maxx - max crosswind
 class WindShell(cmd.Cmd):
+    """
+    WindShell: a stateful command loop for calculating wind stuffs..
+    
+    The shell takes in runway information that is set via the `r DDD` command. This
+    can be any valid runway heading. If a runway is not set, the calculator will run
+    calculations based on the default heading of 000. This can be used to provide
+    calculations solely based on relative wind directions.
+    """
+    
     intro = """
             Welcome to the wind calculator!
             
@@ -122,6 +130,7 @@ class WindShell(cmd.Cmd):
         reset all maximum wind velocities to their original values
         """
         self.wind_calc.reset_all()
+        self.do_show("")
 
     @catch_and_log_error
     def do_x(self, line):

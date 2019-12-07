@@ -300,14 +300,31 @@ class TestWindShell:
         shell.onecmd('reset')
         shell.wind_calc.reset_all.assert_called_with()
         
-    def test_do_winds(self, capsys):
+    @pytest.mark.parametrize('inp', [
+        "winds 330 15",
+        "grid 90",
+        "grid 90 l",
+        "set r 90",
+        "set x 20",
+        "set ldg 20",
+        "set to 20",
+        "show",
+        "reset",
+        "x 330 15",
+        "h 330 15",
+        "maxt 350",
+        "maxt 350 l",
+        "help",     
+        ])
+    def test_do_winds(self, inp, capsys):
         shell = WindShell()
         
-        res = shell.do_winds('330 15')
+        res = shell.onecmd(inp)
         
         out, err = capsys.readouterr()
         
         assert out
         assert not err
+        assert "error" not in out.lower()
         
     
