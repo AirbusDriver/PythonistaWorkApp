@@ -7,7 +7,7 @@ installed on their company iPads.
 Current Apps
 ------------
 
-* \__main__.py: Shell Interface for calculating wind components, and max winds from a 
+* ``__main__.py``: Shell Interface for calculating wind components, and max winds from a 
 range of directions. 
 
 Installation
@@ -27,5 +27,5 @@ Winds Shell
 ---------
 
 Currently, the wind calculation shell is the only thing implemented. The main entry point for the shell is in
-the \__main__.py file. This can be invoked by either running the \__main__.py file directly or by running
-python3 -m work... but, since you are presumably running this in pythonista, just run the file directly.
+the ``__main__.py`` file. This can be invoked by either running the ``__main__.py`` file directly or by running
+``python3 -m work``... but, since you are presumably running this in pythonista, just run the file directly.
